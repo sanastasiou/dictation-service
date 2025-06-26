@@ -726,6 +726,9 @@ install_dictation_service() {
     sed -i "s|%h|$HOME|g" "$CONFIG_BASE/systemd/user/dictation-service.service"
     sed -i "s|$HOME/miniconda3|$CONDA_PATH|g" "$CONFIG_BASE/systemd/user/dictation-service.service"
     
+    # Ensure log directory exists
+    mkdir -p "$INSTALL_BASE/share/dictation-service/logs"
+    
     # Reload systemd
     systemctl --user daemon-reload
     
