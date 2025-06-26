@@ -294,6 +294,7 @@ install_system_deps() {
         "pulseaudio"
         "pulseaudio-utils"
         "portaudio19-dev"
+        "ffmpeg"
         
         # Python build
         "python3-dev"
@@ -699,6 +700,16 @@ install_dictation_service() {
         "$INSTALL_BASE/bin/dictation"
     sed -i "s|~/anaconda3|$CONDA_PATH|g" "$INSTALL_BASE/bin/dictation"
     sed -i "s|~/miniconda3|$CONDA_PATH|g" "$INSTALL_BASE/bin/dictation"
+    
+    # Install systemd service
+    cp config/systemd/dictation-service.service "$CONFIG_BASE/systemd/user/" || error "dictation-service.service not found"
+    
+    # Update paths in service file
+    sed -i "s|%h/miniconda3|$CONDA_PATH|g" "$CONFIG_BASE/systemd/user/dictation-service.service"
+    sed -i "s|%h/dictation-service|$(dirname "$0")|g" "$CONFIG_BASE/systemd/user/dictation-service.service"
+    
+    # Reload systemd
+    systemctl --user daemon-reload
     
     # Device will be configured in config.json instead of hardcoded
     
@@ -1132,6 +1143,38 @@ EOF
     chmod +x "$INSTALL_BASE/bin/dictation-uninstall"
 }
 
+# Configure shell PATH
+configure_shell_path() {
+    log "Configuring shell PATH..."
+    
+    # Check if ~/.local/bin is already in PATH
+    if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
+        # Add to .bashrc if it exists
+        if [ -f "$HOME/.bashrc" ]; then
+            echo "" >> "$HOME/.bashrc"
+            echo "# Added by dictation-service installer" >> "$HOME/.bashrc"
+            echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$HOME/.bashrc"
+            info "Added ~/.local/bin to PATH in .bashrc"
+        fi
+        
+        # Add to .zshrc if it exists
+        if [ -f "$HOME/.zshrc" ]; then
+            echo "" >> "$HOME/.zshrc"
+            echo "# Added by dictation-service installer" >> "$HOME/.zshrc"
+            echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$HOME/.zshrc"
+            info "Added ~/.local/bin to PATH in .zshrc"
+        fi
+        
+        # Export for current session
+        export PATH="$HOME/.local/bin:$PATH"
+        
+        PATH_UPDATE_NEEDED=true
+    else
+        info "~/.local/bin already in PATH"
+        PATH_UPDATE_NEEDED=false
+    fi
+}
+
 # Show completion message
 show_completion() {
     clear
@@ -1182,6 +1225,15 @@ show_completion() {
     echo
     echo -e "${MAGENTA}Enjoy hands-free typing with AI-powered transcription!${NC}"
     echo
+    
+    # Add PATH reload notice if needed
+    if [ "$PATH_UPDATE_NEEDED" = true ]; then
+        echo -e "${YELLOW}Note:${NC} PATH has been updated. To use 'dictation' command in this terminal:"
+        echo "      source ~/.bashrc"
+        echo "      (or open a new terminal)"
+        echo
+    fi
+    
     echo "Installation log saved to: $LOG_FILE"
     
     # Clean up backup if everything succeeded
@@ -1222,6 +1274,7 @@ main() {
     configure_dictation
     create_shortcuts
     create_uninstaller
+    configure_shell_path
     test_installation
     
     # Show completion

@@ -1,0 +1,19 @@
+[Unit]
+Description=GPU-Optimized Dictation Service
+After=graphical-session.target
+
+[Service]
+Type=simple
+Environment="PATH=%h/miniconda3/envs/whisper/bin:/usr/local/bin:/usr/bin:/bin"
+Environment="CONDA_PREFIX=%h/miniconda3/envs/whisper"
+Environment="DISPLAY=:0"
+Environment="XAUTHORITY=%h/.Xauthority"
+ExecStartPre=/bin/bash -c 'xhost +local: > /dev/null 2>&1 || true'
+ExecStart=%h/miniconda3/envs/whisper/bin/python %h/dictation-service/src/dictation-service.py
+Restart=on-failure
+RestartSec=5
+StandardOutput=append:%h/.local/share/dictation-service/logs/dictation-service.log
+StandardError=append:%h/.local/share/dictation-service/logs/dictation-service.log
+
+[Install]
+WantedBy=default.target
