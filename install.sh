@@ -722,9 +722,9 @@ install_dictation_service() {
     # Install systemd service
     cp config/systemd/dictation-service.service "$CONFIG_BASE/systemd/user/" || error "dictation-service.service not found"
     
-    # Update paths in service file
-    sed -i "s|%h/miniconda3|$CONDA_PATH|g" "$CONFIG_BASE/systemd/user/dictation-service.service"
-    sed -i "s|%h/dictation-service|$(dirname "$0")|g" "$CONFIG_BASE/systemd/user/dictation-service.service"
+    # Update paths in service file - replace %h with actual home directory
+    sed -i "s|%h|$HOME|g" "$CONFIG_BASE/systemd/user/dictation-service.service"
+    sed -i "s|$HOME/miniconda3|$CONDA_PATH|g" "$CONFIG_BASE/systemd/user/dictation-service.service"
     
     # Reload systemd
     systemctl --user daemon-reload
