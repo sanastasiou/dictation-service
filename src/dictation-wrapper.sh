@@ -33,5 +33,11 @@ xhost +local: >/dev/null 2>&1 || true
 # Get the directory where this script is located
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# Run the Python script
-exec python "$SCRIPT_DIR/dictation-service.py" "$@"
+# Run the Python script with the correct Python from whisper environment
+PYTHON_PATH="$HOME/miniconda3/envs/whisper/bin/python"
+if [ ! -f "$PYTHON_PATH" ]; then
+    # Fallback to anaconda3 if miniconda3 doesn't exist
+    PYTHON_PATH="$HOME/anaconda3/envs/whisper/bin/python"
+fi
+
+exec "$PYTHON_PATH" "$SCRIPT_DIR/dictation-service.py" "$@"
