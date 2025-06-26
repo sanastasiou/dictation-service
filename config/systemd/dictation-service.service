@@ -7,9 +7,11 @@ Type=simple
 Environment="PATH=%h/miniconda3/envs/whisper/bin:/usr/local/bin:/usr/bin:/bin"
 Environment="CONDA_PREFIX=%h/miniconda3/envs/whisper"
 Environment="DISPLAY=:0"
-Environment="XAUTHORITY=%h/.Xauthority"
-ExecStartPre=/bin/bash -c 'xhost +local: > /dev/null 2>&1 || true'
-ExecStart=%h/miniconda3/envs/whisper/bin/python %h/.local/share/dictation-service/dictation-service.py
+# Try multiple possible Xauthority locations
+Environment="XAUTHORITY=/run/user/%U/gdm/Xauthority"
+ExecStartPre=/bin/bash -c 'export DISPLAY=:0; export XAUTHORITY=${XAUTHORITY:-%h/.Xauthority}; xhost +local: > /dev/null 2>&1 || true'
+# Unset XAUTHORITY if not needed to allow X11 to work without it
+ExecStart=/bin/bash -c 'export DISPLAY=:0; [ -f "$XAUTHORITY" ] || unset XAUTHORITY; exec %h/miniconda3/envs/whisper/bin/python %h/.local/share/dictation-service/dictation-service.py'
 Restart=on-failure
 RestartSec=5
 StandardOutput=append:%h/.local/share/dictation-service/logs/dictation-service.log
