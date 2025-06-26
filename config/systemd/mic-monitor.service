@@ -1,0 +1,24 @@
+[Unit]
+Description=Microphone Activity Monitor
+Documentation=https://github.com/yourusername/dictation-service
+After=graphical-session.target
+Wants=graphical-session.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 %h/.local/share/mic-monitor/mic-monitor.py
+Restart=on-failure
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+# Security settings
+NoNewPrivileges=true
+PrivateTmp=true
+
+# Environment
+Environment="DISPLAY=:0"
+Environment="XAUTHORITY=%h/.Xauthority"
+
+[Install]
+WantedBy=default.target

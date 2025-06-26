@@ -1,0 +1,125 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+.pytest_cache/
+.coverage
+.tox/
+.nox/
+.hypothesis/
+*.cover
+.cache
+
+# Virtual environments
+venv/
+ENV/
+env/
+.venv
+
+# Conda
+conda-meta/
+*.conda
+*.tar.bz2
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.pydevproject
+.settings/
+*.sublime-project
+*.sublime-workspace
+
+# Logs
+*.log
+logs/
+*.log.*
+
+# Audio files (for testing)
+*.wav
+*.mp3
+*.flac
+*.m4a
+*.ogg
+*.opus
+
+# Model files (too large for git)
+*.pt
+*.pth
+*.onnx
+*.bin
+model.bin
+*.safetensors
+whisper-models/
+openai-whisper-*/
+faster-whisper-*/
+
+# Temporary files
+*.tmp
+*.temp
+*.pid
+/tmp/
+.DS_Store
+Thumbs.db
+
+# Configuration (may contain sensitive data)
+config.json
+!config.json.default
+!config.json.example
+
+# System files
+.directory
+.Trash-*
+.nfs*
+
+# Documentation build
+docs/_build/
+docs/_static/
+docs/_templates/
+
+# Package files
+*.deb
+*.rpm
+*.pkg.tar.xz
+*.AppImage
+
+# Backup files
+*.bak
+*.backup
+*~
+backup/
+
+# Test outputs
+test_output/
+test_results/
+*.test
+
+# Installation artifacts
+install.log
+uninstall.log
+
+# Personal notes
+notes.txt
+TODO.txt
+.notes/

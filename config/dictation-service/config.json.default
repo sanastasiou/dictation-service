@@ -1,0 +1,19 @@
+{
+    "silence_threshold": 0.02,
+    "silence_duration": 1.0,
+    "min_speech_duration": 0.3,
+    "pre_record_seconds": 0.5,
+    "whisper_model": "large-v3-turbo",
+    "use_faster_whisper": false,
+    "model_base_path": "~/whisper-models",
+    "language": null,
+    "auto_punctuation": true,
+    "noise_suppression": true,
+    "high_pass_freq": 80,
+    "debug_audio": false,
+    "use_gpu": true,
+    "fp16": true,
+    "beam_size": 5,
+    "best_of": 5,
+    "compute_type": "float16"
+}

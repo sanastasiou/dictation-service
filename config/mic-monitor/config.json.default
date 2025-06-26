@@ -1,0 +1,10 @@
+{
+    "check_interval": 0.5,
+    "indicator_type": "tray",
+    "show_app_name": true,
+    "log_activity": false,
+    "position": "top-right",
+    "monitor_all_devices": false,
+    "monitor_device": "",
+    "ignore_devices": ["Monitor of", "QuickCam"]
+}

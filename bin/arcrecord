@@ -1,0 +1,3 @@
+#!/bin/bash
+# Run with verbose to see what device it's actually using
+exec parecord --device="alsa_input.usb-SteelSeries_SteelSeries_Arctis_7-00.mono-chat" -v --format=s16le --rate=48000 --channels=1 "$@"

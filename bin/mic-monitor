@@ -1,0 +1,33 @@
+#!/bin/bash
+# Microphone Monitor Control Script
+
+SERVICE_NAME="mic-monitor"
+
+case "$1" in
+    start)
+        systemctl --user start ${SERVICE_NAME}.service
+        echo "Microphone monitor started"
+        ;;
+    stop)
+        systemctl --user stop ${SERVICE_NAME}.service
+        echo "Microphone monitor stopped"
+        ;;
+    restart)
+        systemctl --user restart ${SERVICE_NAME}.service
+        echo "Microphone monitor restarted"
+        ;;
+    status)
+        systemctl --user status ${SERVICE_NAME}.service
+        ;;
+    logs)
+        journalctl --user -u ${SERVICE_NAME}.service -f
+        ;;
+    test)
+        echo "Testing microphone detection..."
+        python3 ~/.local/share/mic-monitor/mic-monitor.py
+        ;;
+    *)
+        echo "Usage: $0 {start|stop|restart|status|logs|test}"
+        exit 1
+        ;;
+esac
