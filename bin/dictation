@@ -51,7 +51,7 @@ case "$1" in
         # Check if it's still running
         if ps -p $PYTHON_PID > /dev/null 2>&1; then
             echo -e "${GREEN}✓ Dictation service started${NC}"
-            echo "Speak into your Arctis 7 microphone and text will appear where your cursor is."
+            echo "Speak into your microphone and text will appear where your cursor is."
         else
             echo -e "${RED}✗ Failed to start dictation service${NC}"
             echo "Check logs: dictation logs"
@@ -77,8 +77,8 @@ case "$1" in
             kill -9 "$PID" 2>/dev/null
         fi
 
-        # Also kill any parecord processes
-        pkill -f "parecord.*Arctis" 2>/dev/null
+        # Also kill any parecord processes started by this service
+        pkill -f "parecord.*--format=s16le.*--rate=48000" 2>/dev/null
 
         rm -f "$PID_FILE" "/tmp/dictation-recording"
         echo -e "${RED}✓ Dictation service stopped${NC}"
@@ -96,7 +96,7 @@ case "$1" in
             echo -e "${GREEN}● Dictation service is running (PID: $PID)${NC}"
 
             # Check if parecord is also running
-            if pgrep -f "parecord.*Arctis" > /dev/null; then
+            if pgrep -f "parecord.*--format=s16le.*--rate=48000" > /dev/null; then
                 echo -e "${GREEN}  ✓ Audio capture active${NC}"
             else
                 echo -e "${RED}  ✗ Audio capture not running${NC}"

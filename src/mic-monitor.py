@@ -83,7 +83,7 @@ class MicrophoneMonitor:
             "log_activity": True,
             "position": "top-right",
             "monitor_all_devices": True,  # New option
-            "monitor_device": "",  # Device name pattern to monitor (e.g., "Arctis")
+            "monitor_device": "",  # Device name pattern to monitor
             "ignore_devices": []  # List of device patterns to ignore
         }
 

@@ -687,8 +687,8 @@ install_dictation_service() {
     chmod +x "$INSTALL_BASE/bin/arcrecord"
     
     # Update device in arcrecord script
-    sed -i "s|alsa_input.usb-SteelSeries_SteelSeries_Arctis_7-00.mono-chat|$SELECTED_DEVICE|g" \
-        "$INSTALL_BASE/bin/arcrecord"
+    # Set environment variable in the script
+    sed -i "2i AUDIO_DEVICE=\"$SELECTED_DEVICE\"" "$INSTALL_BASE/bin/arcrecord"
     
     # Install control script
     cp bin/dictation "$INSTALL_BASE/bin/" || error "dictation control script not found"
@@ -700,9 +700,7 @@ install_dictation_service() {
     sed -i "s|~/anaconda3|$CONDA_PATH|g" "$INSTALL_BASE/bin/dictation"
     sed -i "s|~/miniconda3|$CONDA_PATH|g" "$INSTALL_BASE/bin/dictation"
     
-    # Update device in dictation-service.py
-    sed -i "s|alsa_input.usb-SteelSeries_SteelSeries_Arctis_7-00.mono-chat|$SELECTED_DEVICE|g" \
-        "$INSTALL_BASE/share/dictation-service/dictation-service.py"
+    # Device will be configured in config.json instead of hardcoded
     
     INSTALLED_COMPONENTS+=("dictation-service")
     success "Dictation service installed"
@@ -924,6 +922,7 @@ configure_dictation() {
     # Create configuration
     cat > "$CONFIG_BASE/dictation-service/config.json" << EOF
 {
+    "audio_device": "$SELECTED_DEVICE",
     "silence_threshold": $SILENCE_THRESHOLD,
     "silence_duration": $SILENCE_DURATION,
     "min_speech_duration": 0.3,

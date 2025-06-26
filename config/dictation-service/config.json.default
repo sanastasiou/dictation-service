@@ -1,4 +1,5 @@
 {
+    "audio_device": null,
     "silence_threshold": 0.02,
     "silence_duration": 1.0,
     "min_speech_duration": 0.3,

@@ -1,3 +1,5 @@
 #!/bin/bash
-# Run with verbose to see what device it's actually using
-exec parecord --device="alsa_input.usb-SteelSeries_SteelSeries_Arctis_7-00.mono-chat" -v --format=s16le --rate=48000 --channels=1 "$@"
+# Audio recording wrapper - device will be set during installation
+# Default to first available non-monitor device if not configured
+DEVICE="${AUDIO_DEVICE:-$(pactl list short sources | grep -v '\.monitor' | head -1 | cut -f2)}"
+exec parecord --device="$DEVICE" -v --format=s16le --rate=48000 --channels=1 "$@"

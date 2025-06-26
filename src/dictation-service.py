@@ -123,7 +123,7 @@ class DictationService:
         self.config = self.load_config()
 
         # Audio parameters
-        self.DEVICE = "alsa_input.usb-SteelSeries_SteelSeries_Arctis_7-00.mono-chat"
+        self.DEVICE = self.get_audio_device()
         self.RATE = 48000
         self.CHANNELS = 1
         self.CHUNK_SECONDS = 0.01
@@ -174,6 +174,36 @@ class DictationService:
         )
         self.logger = logging.getLogger(__name__)
 
+    def get_audio_device(self):
+        """Get audio device from config or environment"""
+        # First check config file
+        if hasattr(self, 'config') and self.config.get('audio_device'):
+            return self.config['audio_device']
+        
+        # Then check environment variable
+        device = os.environ.get('DICTATION_AUDIO_DEVICE')
+        if device:
+            return device
+        
+        # Finally, try to get first available non-monitor device
+        try:
+            result = subprocess.run(
+                ['pactl', 'list', 'short', 'sources'],
+                capture_output=True,
+                text=True,
+                check=True
+            )
+            for line in result.stdout.strip().split('\n'):
+                if line and '.monitor' not in line:
+                    # Return the device name (second column)
+                    return line.split('\t')[1]
+        except:
+            pass
+        
+        # Fallback to default
+        self.logger.warning("No audio device configured or found, using default")
+        return "default"
+    
     def load_config(self):
         """Load configuration from file"""
         default_config = {
