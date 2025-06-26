@@ -80,6 +80,7 @@ faster-whisper-*/
 *.temp
 *.pid
 /tmp/
+tmp/
 .DS_Store
 Thumbs.db
 
