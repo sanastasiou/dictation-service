@@ -711,6 +711,18 @@ install_dictation_service() {
     # Reload systemd
     systemctl --user daemon-reload
     
+    # Ask about auto-start
+    echo
+    echo "Would you like the dictation service to start automatically on login? (Y/n)"
+    read -n 1 -r
+    echo
+    if [[ ! $REPLY =~ ^[Nn]$ ]]; then
+        systemctl --user enable dictation-service.service
+        success "Dictation service will start automatically on login"
+    else
+        info "You can enable auto-start later with: systemctl --user enable dictation-service"
+    fi
+    
     # Device will be configured in config.json instead of hardcoded
     
     INSTALLED_COMPONENTS+=("dictation-service")
