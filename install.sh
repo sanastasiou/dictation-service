@@ -26,6 +26,8 @@ DEFAULT_CONDA_PATH="$HOME/miniconda3"
 # Installation state tracking
 INSTALLED_COMPONENTS=()
 ORIGINAL_DIR="$(pwd)"
+DICTATION_AUTO_START=false
+PATH_UPDATE_NEEDED=false
 
 # Logging functions
 log() {
@@ -719,8 +721,24 @@ install_dictation_service() {
     if [[ ! $REPLY =~ ^[Nn]$ ]]; then
         systemctl --user enable dictation-service.service
         success "Dictation service will start automatically on login"
+        DICTATION_AUTO_START=true
+        
+        # Also start it now
+        echo
+        echo "Would you like to start the dictation service now? (Y/n)"
+        read -n 1 -r
+        echo
+        if [[ ! $REPLY =~ ^[Nn]$ ]]; then
+            systemctl --user start dictation-service
+            if systemctl --user is-active --quiet dictation-service; then
+                success "Dictation service is now running"
+            else
+                warn "Could not start service. Check logs after installation."
+            fi
+        fi
     else
         info "You can enable auto-start later with: systemctl --user enable dictation-service"
+        DICTATION_AUTO_START=false
     fi
     
     # Device will be configured in config.json instead of hardcoded
@@ -1243,6 +1261,22 @@ show_completion() {
         echo -e "${YELLOW}Note:${NC} PATH has been updated. To use 'dictation' command in this terminal:"
         echo "      source ~/.bashrc"
         echo "      (or open a new terminal)"
+        echo
+    fi
+    
+    # Add reboot notice if auto-start was enabled but service isn't running
+    if [ "$DICTATION_AUTO_START" = true ] && ! systemctl --user is-active --quiet dictation-service; then
+        echo -e "${YELLOW}╔═══════════════════════════════════════════════════════════╗${NC}"
+        echo -e "${YELLOW}║                    REBOOT REQUIRED                         ║${NC}"
+        echo -e "${YELLOW}╚═══════════════════════════════════════════════════════════╝${NC}"
+        echo
+        echo "The dictation service is set to start automatically, but requires"
+        echo "a reboot or re-login for the auto-start to take effect."
+        echo
+        echo -e "${GREEN}Options:${NC}"
+        echo "1. Reboot now: sudo reboot"
+        echo "2. Start manually now: dictation start"
+        echo "3. Re-login to your session"
         echo
     fi
     
