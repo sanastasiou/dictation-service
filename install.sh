@@ -577,17 +577,33 @@ test_microphone() {
     echo "(You should see the level meter moving)"
     echo
     
-    # Record and show levels
-    timeout 3 bash -c "parec --device=$device --format=s16le --rate=16000 --channels=1 2>/dev/null | \
-        while true; do
-            dd bs=1024 count=1 2>/dev/null | \
-            od -t d2 -N 1024 -v | \
-            awk '{ for(i=2;i<=NF;i++) { sum+=\$i<0?-\$i:\$i; n++ }} \
-                END { avg=n?sum/n:0; \
-                      bar=\"\"; \
-                      for(j=0;j<avg/500;j++) bar=bar\"█\"; \
-                      printf \"\rLevel: %-50s\", bar }'
-        done"
+    # Test if parec works with this device
+    if ! parec --device=$device --format=s16le --rate=16000 --channels=1 2>/dev/null | head -c 1 >/dev/null 2>&1; then
+        warn "Could not access microphone device"
+        echo "This might be normal in a VM or with certain audio configurations."
+        echo
+        echo "Continue anyway? (Y/n)"
+        read -n 1 -r
+        echo
+        if [[ $REPLY =~ ^[Nn]$ ]]; then
+            error "Installation cancelled due to microphone access issues"
+        fi
+        return
+    fi
+    
+    # Record and show levels with better error handling
+    (
+        timeout 3 bash -c "parec --device=$device --format=s16le --rate=16000 --channels=1 2>/dev/null | \
+            while true; do
+                dd bs=1024 count=1 2>/dev/null | \
+                od -t d2 -N 1024 -v | \
+                awk '{ for(i=2;i<=NF;i++) { sum+=\$i<0?-\$i:\$i; n++ }} \
+                    END { avg=n?sum/n:0; \
+                          bar=\"\"; \
+                          for(j=0;j<avg/500;j++) bar=bar\"█\"; \
+                          printf \"\rLevel: %-50s\", bar }'
+            done" || true
+    )
     
     echo
     echo
