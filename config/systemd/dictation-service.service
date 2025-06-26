@@ -10,8 +10,8 @@ Environment="DISPLAY=:0"
 # Try multiple possible Xauthority locations
 Environment="XAUTHORITY=/run/user/%U/gdm/Xauthority"
 ExecStartPre=/bin/bash -c 'export DISPLAY=:0; export XAUTHORITY=${XAUTHORITY:-%h/.Xauthority}; xhost +local: > /dev/null 2>&1 || true'
-# Unset XAUTHORITY if not needed to allow X11 to work without it
-ExecStart=/bin/bash -c 'export DISPLAY=:0; [ -f "$XAUTHORITY" ] || unset XAUTHORITY; exec %h/miniconda3/envs/whisper/bin/python %h/.local/share/dictation-service/dictation-service.py'
+# Use wrapper script that handles X11/Wayland properly
+ExecStart=%h/miniconda3/envs/whisper/bin/bash %h/.local/share/dictation-service/dictation-wrapper.sh
 Restart=on-failure
 RestartSec=5
 StandardOutput=append:%h/.local/share/dictation-service/logs/dictation-service.log

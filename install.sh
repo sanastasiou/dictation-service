@@ -697,9 +697,12 @@ install_dictation_service() {
     mkdir -p "$INSTALL_BASE/share/dictation-service/logs"
     mkdir -p "$CONFIG_BASE/dictation-service"
     
-    # Copy dictation script
+    # Copy dictation script and wrapper
     cp src/dictation-service.py "$INSTALL_BASE/share/dictation-service/" || error "dictation-service.py not found"
     chmod +x "$INSTALL_BASE/share/dictation-service/dictation-service.py"
+    
+    cp src/dictation-wrapper.sh "$INSTALL_BASE/share/dictation-service/" || error "dictation-wrapper.sh not found"
+    chmod +x "$INSTALL_BASE/share/dictation-service/dictation-wrapper.sh"
     
     # Copy arcrecord script
     cp bin/arcrecord "$INSTALL_BASE/bin/" || error "arcrecord script not found"
@@ -1213,6 +1216,19 @@ configure_shell_path() {
             echo "# Added by dictation-service installer" >> "$HOME/.zshrc"
             echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$HOME/.zshrc"
             info "Added ~/.local/bin to PATH in .zshrc"
+        fi
+        
+        # IMPORTANT: Also add to .profile for login shells
+        if [ -f "$HOME/.profile" ]; then
+            # Check if PATH addition already exists in .profile
+            if ! grep -q "/.local/bin" "$HOME/.profile"; then
+                echo "" >> "$HOME/.profile"
+                echo "# Added by dictation-service installer" >> "$HOME/.profile"
+                echo 'if [ -d "$HOME/.local/bin" ] ; then' >> "$HOME/.profile"
+                echo '    PATH="$HOME/.local/bin:$PATH"' >> "$HOME/.profile"
+                echo 'fi' >> "$HOME/.profile"
+                info "Added ~/.local/bin to PATH in .profile"
+            fi
         fi
         
         # Export for current session
