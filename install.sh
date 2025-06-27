@@ -1363,6 +1363,56 @@ main() {
     show_completion
     
     log "Installation completed successfully!"
+    
+    # Offer reboot/logout options
+    echo
+    echo -e "${YELLOW}═══════════════════════════════════════════════════════════${NC}"
+    echo -e "${YELLOW}The system needs to be restarted for services to work properly.${NC}"
+    echo -e "${YELLOW}═══════════════════════════════════════════════════════════${NC}"
+    echo
+    echo "Please choose an option:"
+    echo -e "${GREEN}1)${NC} Reboot system ${GREEN}(Recommended)${NC}"
+    echo -e "${BLUE}2)${NC} Logout and login again"
+    echo -e "${YELLOW}3)${NC} Do nothing (services will not start until next session)"
+    echo
+    
+    while true; do
+        read -p "Enter your choice [1-3]: " choice
+        case $choice in
+            1)
+                echo -e "\n${GREEN}Rebooting system...${NC}"
+                sleep 2
+                sudo reboot
+                ;;
+            2)
+                echo -e "\n${BLUE}Logging out...${NC}"
+                echo "Please log back in to use the dictation service."
+                sleep 2
+                # Try different logout commands for different desktop environments
+                if command -v gnome-session-quit &> /dev/null; then
+                    gnome-session-quit --logout --no-prompt
+                elif command -v loginctl &> /dev/null; then
+                    loginctl terminate-user $USER
+                elif command -v pkill &> /dev/null; then
+                    pkill -KILL -u $USER
+                else
+                    echo -e "${RED}Could not find logout command. Please logout manually.${NC}"
+                    exit 0
+                fi
+                ;;
+            3)
+                echo -e "\n${YELLOW}Installation complete.${NC}"
+                echo "Note: The dictation service will not work until you start a new session."
+                echo "You can manually start it with: systemctl --user start dictation-service"
+                exit 0
+                ;;
+            *)
+                echo -e "${RED}Invalid choice. Please enter 1, 2, or 3.${NC}"
+                continue
+                ;;
+        esac
+        break
+    done
 }
 
 # Run main installation
